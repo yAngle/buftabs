@@ -236,7 +236,7 @@ function! Buftabs_show(deleted_buf)
 				let l:name = fnamemodify(bufname(l:i), ":t")
         if strlen(l:name) > 15 " abbreviate ridiculously long names
           let l:splitted = split(l:name, "\\.")
-          let l:basename = join(l:splitted[:-2], "\\.")
+          let l:basename = join(l:splitted[:-2], ".")
           let l:basename = substitute(l:basename, "\\([A-z]\\)[a-z]*", "\\1", "g")
           let l:name = l:basename . "." . l:splitted[-1]
         endif
