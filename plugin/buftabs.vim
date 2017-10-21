@@ -319,7 +319,11 @@ function! Buftabs_show(deleted_buf)
 		" Only overwrite the statusline if buftabs#statusline() has not been
 		" used to specify a location
 		if match(&statusline, "%{buftabs#statusline()}") == -1
-			let &l:statusline = s:list . w:original_statusline
+      if exists('g:noscrollbar_loaded') && !has("gui_running")
+        let &l:statusline = s:list . "%=▕%#ScrollBar#%{noscrollbar#statusline(11,' ','█',['▐'],['▌'])}%##"
+      else
+        let &l:statusline = s:list . w:original_statusline
+      endif
 		end
 	else
 		redraw
