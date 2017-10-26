@@ -22,14 +22,14 @@
 "
 " Usage
 " -----
-" 
+"
 " This script draws buffer tabs on vim startup, when a new buffer is created
 " and when switching between buffers.
 "
 " It might be handy to create a few maps for easy switching of buffers in your
 " .vimrc file. For example, using F1 and F2 keys:
 "
-"   noremap <f1> :bprev<CR> 
+"   noremap <f1> :bprev<CR>
 "   noremap <f2> :bnext<CR>
 "
 " or using control-left and control-right keys:
@@ -39,7 +39,7 @@
 "
 "
 " The following extra configuration variables are availabe:
-" 
+"
 " * g:buftabs_only_basename
 "
 "   Define this variable to make buftabs only print the filename of each buffer,
@@ -56,7 +56,7 @@
 "
 "   set laststatus=2
 "   :let g:buftabs_in_statusline=1
-"    
+"
 "   By default buftabs will take up the whole of the left-aligned section of
 "   your statusline. You can alternatively specify precisely where it goes
 "   using %{buftabs#statusline()} e.g.:
@@ -80,10 +80,10 @@
 " * g:buftabs_separator       -
 " * g:buftabs_marker_modified !
 "
-"   These strings are drawn around each tab as separators, the 'marker_modified' 
+"   These strings are drawn around each tab as separators, the 'marker_modified'
 "   symbol is used to denote a modified (unsaved) buffer.
 "
-"   :let g:buftabs_separator = "."  
+"   :let g:buftabs_separator = "."
 "   :let g:buftabs_marker_start = "("
 "   :let g:buftabs_marker_end = ")"
 "   :let g:buftabs_marker_modified = "*"
@@ -91,8 +91,8 @@
 "
 " Changelog
 " ---------
-" 
-" 0.1  2006-09-22  Initial version 
+"
+" 0.1  2006-09-22  Initial version
 "
 " 0.2  2006-09-22  Better handling when the list of buffers is longer then the
 "                  window width.
@@ -106,7 +106,7 @@
 "                  in tabs
 "
 " 0.6  2007-03-04  'only_basename' changed to a global variable.  Removed
-"                  functions and add event handlers instead.  'hidden' mode 
+"                  functions and add event handlers instead.  'hidden' mode
 "                  broke some things, so is disabled now. Fixed documentation
 "
 " 0.7  2007-03-07  Added configuration option to show tabs in statusline
@@ -126,7 +126,7 @@
 "
 " 0.14 2010-01-28  Fixed bug that caused buftabs in command line being
 "                  overwritten when 'hidden' mode is enabled.
-" 
+"
 " 0.15 2010-02-16  Fixed window width handling bug which caused strange
 "                  behaviour in combination with the bufferlist plugin.
 "                  Fixed wrong buffer display when deleting last window.
@@ -153,9 +153,9 @@ let w:original_statusline = matchstr(&statusline, "%=.*")
 " Don't bother when in diff mode
 "
 
-if &diff                                      
-	finish
-endif     
+if &diff
+    finish
+endif
 
 
 "
@@ -163,23 +163,23 @@ endif
 "
 
 function! Buftabs_enable()
-	let w:buftabs_enabled = 1
+    let w:buftabs_enabled = 1
 endfunction
 
 
 "
 " Persistent echo to avoid overwriting of status line when 'hidden' is enabled
-" 
+"
 
 let s:Pecho=''
 function! s:Pecho(msg)
-	if &ut!=1|let s:hold_ut=&ut|let &ut=1|en
-	let s:Pecho=a:msg
-	aug Pecho
-		au CursorHold * if s:Pecho!=''|echo s:Pecho
-					\|let s:Pecho=''|let &ut=s:hold_ut|en
-				\|aug Pecho|exe 'au!'|aug END|aug! Pecho
-	aug END
+    if &ut!=1|let s:hold_ut=&ut|let &ut=1|en
+    let s:Pecho=a:msg
+    aug Pecho
+        au CursorHold * if s:Pecho!=''|echo s:Pecho
+            \|let s:Pecho=''|let &ut=s:hold_ut|en
+        \|aug Pecho|exe 'au!'|aug END|aug! Pecho
+    aug END
 endf
 
 
@@ -189,146 +189,146 @@ endf
 
 function! Buftabs_show(deleted_buf)
 
-	let l:i = 1
-	let s:list = ''
-	let l:start = 0
-	let l:end = 0
-	if ! exists("w:from") 
-		let w:from = 0
-	endif
+    let l:i = 1
+    let s:list = ''
+    let l:start = 0
+    let l:end = 0
+    if ! exists("w:from")
+        let w:from = 0
+    endif
 
-	if ! exists("w:buftabs_enabled")
-		return
-	endif
+    if ! exists("w:buftabs_enabled")
+        return
+    endif
 
-	let l:buftabs_marker_modified = "!"
-	if exists("g:buftabs_marker_modified")
-		let l:buftabs_marker_modified = g:buftabs_marker_modified
-	endif
+    let l:buftabs_marker_modified = "!"
+    if exists("g:buftabs_marker_modified")
+        let l:buftabs_marker_modified = g:buftabs_marker_modified
+    endif
 
-	let l:buftabs_separator = "-"
-	if exists("g:buftabs_separator")
-		let l:buftabs_separator = g:buftabs_separator
-	endif
+    let l:buftabs_separator = "-"
+    if exists("g:buftabs_separator")
+        let l:buftabs_separator = g:buftabs_separator
+    endif
 
-	let l:buftabs_marker_start = "["
-	if exists("g:buftabs_marker_start")
-		let l:buftabs_marker_start = g:buftabs_marker_start
-	endif
+    let l:buftabs_marker_start = "["
+    if exists("g:buftabs_marker_start")
+        let l:buftabs_marker_start = g:buftabs_marker_start
+    endif
 
-	let l:buftabs_marker_end = "]"
-	if exists("g:buftabs_marker_end")
-		let l:buftabs_marker_end = g:buftabs_marker_end
-	endif
+    let l:buftabs_marker_end = "]"
+    if exists("g:buftabs_marker_end")
+        let l:buftabs_marker_end = g:buftabs_marker_end
+    endif
 
-	" Walk the list of buffers
+    " Walk the list of buffers
 
-	while(l:i <= bufnr('$'))
+    while(l:i <= bufnr('$'))
 
-		" Only show buffers in the list, and omit help screens
-	
-		if buflisted(l:i) && getbufvar(l:i, "&modifiable") && a:deleted_buf != l:i
+        " Only show buffers in the list, and omit help screens
 
-			" Get the name of the current buffer, and escape characters that might
-			" mess up the statusline
+        if buflisted(l:i) && getbufvar(l:i, "&modifiable") && a:deleted_buf != l:i
 
-			if exists("g:buftabs_only_basename")
-				let l:name = fnamemodify(bufname(l:i), ":t")
-        if strlen(l:name) > 15 " abbreviate ridiculously long names
-          let l:splitted = split(l:name, "\\.")
-          let l:basename = join(l:splitted[:-2], ".")
-          let l:basename = substitute(l:basename, "\\([A-Za-z]\\)[a-z]*", "\\1", "g")
-          let l:name = l:basename . "." . l:splitted[-1]
-        endif
-			else
-				let l:name = bufname(l:i)
-			endif
-			let l:name = substitute(l:name, "%", "%%", "g")
-			
-			" Append the current buffer number and name to the list. If the buffer
-			" is the active buffer, enclose it in some magick characters which will
-			" be replaced by markers later. If it is modified, it is appended with
-			" an appropriate symbol (an exclamation mark by default)
+            " Get the name of the current buffer, and escape characters that might
+            " mess up the statusline
 
-			if winbufnr(winnr()) == l:i
-				let l:start = strlen(s:list)
-				let s:list = s:list . "\x01"
-			else
-				let s:list = s:list . ' '
-			endif
-				
-			" let s:list = s:list . l:i . l:buftabs_separator
-			let s:list = s:list . l:name
+            if exists("g:buftabs_only_basename")
+                let l:name = fnamemodify(bufname(l:i), ":t")
+                if strlen(l:name) > 15 " abbreviate ridiculously long names
+                    let l:splitted = split(l:name, "\\.")
+                    let l:basename = join(l:splitted[:-2], ".")
+                    let l:basename = substitute(l:basename, "\\([A-Za-z]\\)[a-z]*", "\\1", "g")
+                    let l:name = l:basename . "." . l:splitted[-1]
+                endif
+            else
+                let l:name = bufname(l:i)
+            endif
+            let l:name = substitute(l:name, "%", "%%", "g")
 
-			if getbufvar(l:i, "&modified") == 1
-				let s:list = s:list . l:buftabs_marker_modified
-			endif
-			
-			if winbufnr(winnr()) == l:i
-				let s:list = s:list . "\x02"
-				let l:end = strlen(s:list)
-			else
-				let s:list = s:list . ' '
-			endif
-		end
+            " Append the current buffer number and name to the list. If the buffer
+            " is the active buffer, enclose it in some magick characters which will
+            " be replaced by markers later. If it is modified, it is appended with
+            " an appropriate symbol (an exclamation mark by default)
 
-		let l:i = l:i + 1
-	endwhile
+            if winbufnr(winnr()) == l:i
+                let l:start = strlen(s:list)
+                let s:list = s:list . "\x01"
+            else
+                let s:list = s:list . ' '
+            endif
 
-	" If the resulting list is too long to fit on the screen, chop
-	" out the appropriate part
+            " let s:list = s:list . l:i . l:buftabs_separator
+            let s:list = s:list . l:name
 
-	let l:width = winwidth(0) - 12
+            if getbufvar(l:i, "&modified") == 1
+                let s:list = s:list . l:buftabs_marker_modified
+            endif
 
-	if(l:start < w:from) 
-		let w:from = l:start - 1
-	endif
-	if l:end > w:from + l:width
-		let w:from = l:end - l:width 
-	endif
-		
-	let s:list = strpart(s:list, w:from, l:width)
+            if winbufnr(winnr()) == l:i
+                let s:list = s:list . "\x02"
+                let l:end = strlen(s:list)
+            else
+                let s:list = s:list . ' '
+            endif
+        end
 
-	" Replace the magic characters by visible markers for highlighting the
-	" current buffer. The markers can be simple characters like square brackets,
-	" but can also be special codes with highlight groups
-  
-	if exists("g:buftabs_active_highlight_group")
-		if exists("g:buftabs_in_statusline")
-			let l:buftabs_marker_start = "%#" . g:buftabs_active_highlight_group . "#" . l:buftabs_marker_start
-			let l:buftabs_marker_end = l:buftabs_marker_end . "%##"
-		end
-	end
+        let l:i = l:i + 1
+    endwhile
 
-	if exists("g:buftabs_inactive_highlight_group")
-		if exists("g:buftabs_in_statusline")
-			let s:list = '%#' . g:buftabs_inactive_highlight_group . '#' . s:list
-			let s:list .= '%##'
-			let l:buftabs_marker_end = l:buftabs_marker_end . '%#' . g:buftabs_inactive_highlight_group . '#'
-		end
-	end
+    " If the resulting list is too long to fit on the screen, chop
+    " out the appropriate part
 
-	let s:list = substitute(s:list, "\x01", l:buftabs_marker_start, 'g')
-	let s:list = substitute(s:list, "\x02", l:buftabs_marker_end, 'g')
+    let l:width = winwidth(0) - 12
 
-	" Show the list. The buftabs_in_statusline variable determines of the list
-	" is displayed in the command line (volatile) or in the statusline
-	" (persistent)
+    if(l:start < w:from)
+        let w:from = l:start - 1
+    endif
+    if l:end > w:from + l:width
+        let w:from = l:end - l:width
+    endif
 
-	if exists("g:buftabs_in_statusline")
-		" Only overwrite the statusline if buftabs#statusline() has not been
-		" used to specify a location
-		if match(&statusline, "%{buftabs#statusline()}") == -1
-      if exists('g:noscrollbar_loaded') && !has("gui_running")
-        let &l:statusline = s:list . "%=▕%#ScrollBar#%{noscrollbar#statusline(11,' ','█',['▐'],['▌'])}%##"
-      else
-        let &l:statusline = s:list . w:original_statusline
-      endif
-		end
-	else
-		redraw
-		call s:Pecho(s:list)
-	end
+    let s:list = strpart(s:list, w:from, l:width)
+
+    " Replace the magic characters by visible markers for highlighting the
+    " current buffer. The markers can be simple characters like square brackets,
+    " but can also be special codes with highlight groups
+
+    if exists("g:buftabs_active_highlight_group")
+        if exists("g:buftabs_in_statusline")
+            let l:buftabs_marker_start = "%#" . g:buftabs_active_highlight_group . "#" . l:buftabs_marker_start
+            let l:buftabs_marker_end = l:buftabs_marker_end . "%##"
+        end
+    end
+
+    if exists("g:buftabs_inactive_highlight_group")
+        if exists("g:buftabs_in_statusline")
+            let s:list = '%#' . g:buftabs_inactive_highlight_group . '#' . s:list
+            let s:list .= '%##'
+            let l:buftabs_marker_end = l:buftabs_marker_end . '%#' . g:buftabs_inactive_highlight_group . '#'
+        end
+    end
+
+    let s:list = substitute(s:list, "\x01", l:buftabs_marker_start, 'g')
+    let s:list = substitute(s:list, "\x02", l:buftabs_marker_end, 'g')
+
+    " Show the list. The buftabs_in_statusline variable determines of the list
+    " is displayed in the command line (volatile) or in the statusline
+    " (persistent)
+
+    if exists("g:buftabs_in_statusline")
+        " Only overwrite the statusline if buftabs#statusline() has not been
+        " used to specify a location
+        if match(&statusline, "%{buftabs#statusline()}") == -1
+            if exists('g:noscrollbar_loaded') && !has("gui_running")
+                let &l:statusline = s:list . "%=▕%#ScrollBar#%{noscrollbar#statusline(11,' ','█',['▐'],['▌'])}%##"
+            else
+                let &l:statusline = s:list . w:original_statusline
+            endif
+        end
+    else
+        redraw
+        call s:Pecho(s:list)
+    end
 
 endfunction
 
@@ -340,7 +340,7 @@ endfunction
 "
 
 function! buftabs#statusline(...)
-	return s:list
+    return s:list
 endfunction
 
 
@@ -353,8 +353,5 @@ autocmd VimEnter * call Buftabs_enable()
 autocmd VimEnter,BufNew,BufEnter,BufWritePost * call Buftabs_show(-1)
 autocmd BufDelete * call Buftabs_show(expand('<abuf>'))
 if version >= 700
-	autocmd InsertLeave,VimResized * call Buftabs_show(-1)
+    autocmd InsertLeave,VimResized * call Buftabs_show(-1)
 end
-
-" vi: ts=2 sw=2
-
