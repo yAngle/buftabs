@@ -147,7 +147,6 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let w:buftabs_enabled = 0
-let w:original_statusline = matchstr(&statusline, "%=.*")
 
 "
 " Don't bother when in diff mode
@@ -322,7 +321,7 @@ function! Buftabs_show(deleted_buf)
             if exists('g:noscrollbar_loaded') && !has("gui_running")
                 let &l:statusline = s:list . "%=▕%#ScrollBar#%{noscrollbar#statusline(11,' ','█',['▐'],['▌'])}%##"
             else
-                let &l:statusline = s:list . w:original_statusline
+                let &l:statusline = s:list
             endif
         end
     else
