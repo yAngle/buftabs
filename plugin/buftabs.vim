@@ -277,7 +277,8 @@ function! Buftabs_show(deleted_buf)
     " If the resulting list is too long to fit on the screen, chop
     " out the appropriate part
 
-    let l:width = winwidth(0) - 12
+    let l:has_noscrollbar = exists('g:noscrollbar_loaded') && !has("gui_running")
+    let l:width = winwidth(0) - (l:has_noscrollbar ? 12 : 0)
 
     if(l:start < w:from)
         let w:from = l:start - 1
@@ -318,7 +319,7 @@ function! Buftabs_show(deleted_buf)
         " Only overwrite the statusline if buftabs#statusline() has not been
         " used to specify a location
         if match(&statusline, "%{buftabs#statusline()}") == -1
-            if exists('g:noscrollbar_loaded') && !has("gui_running")
+            if l:has_noscrollbar
                 let &l:statusline = s:list . "%=▕%#ScrollBar#%{noscrollbar#statusline(11,' ','█',['▐'],['▌'])}%##"
             else
                 let &l:statusline = s:list
