@@ -224,9 +224,12 @@ function! Buftabs_show(deleted_buf)
 
     while(l:i <= bufnr('$'))
 
-        " Only show buffers in the list, and omit help screens
+        " Only show buffers in the list, and omit help screens / netrw.
 
-        if buflisted(l:i) && getbufvar(l:i, "&modifiable") && a:deleted_buf != l:i
+        if buflisted(l:i) &&
+            \ getbufvar(l:i, "&modifiable") &&
+            \ !getbufvar(l:i, "netrw_browser_active") &&
+            \ a:deleted_buf != l:i
 
             " Get the name of the current buffer, and escape characters that might
             " mess up the statusline
