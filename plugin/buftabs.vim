@@ -227,7 +227,7 @@ function! Buftabs_show(deleted_buf)
         " Only show buffers in the list, and omit help screens / netrw.
 
         if buflisted(l:i) &&
-            \ getbufvar(l:i, "&modifiable") &&
+            \ (v:progname =~ '.*view' || getbufvar(l:i, "&modifiable")) &&
             \ !getbufvar(l:i, "netrw_browser_active") &&
             \ a:deleted_buf != l:i
 
